@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>다독e - 시그니처 북 (생일 축하 에디션)</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --paper: #fdfaf1;
+            --book-width: 320px;
+            --book-height: 480px;
+        }
+
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Pretendard', sans-serif;
+            perspective: 2000px;
+        }
+
+        .book-container {
+            position: relative;
+            width: var(--book-width);
+            height: var(--book-height);
+            transform-style: preserve-3d;
+        }
+
+        /* 페이지 공통 설정 */
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            transform-origin: left;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1), z-index 0.1s step-end;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        /* 앞면/뒷면 공통 설정 */
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 0 5px 5px 0;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            box-shadow: inset -3px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .back {
+            transform: rotateY(180deg);
+            background-color: #f0f0f0;
+            border-right: 10px solid #ddd;
+        }
+
+        /* 1. 표지 레이어 */
+        .book-cover { z-index: 3; }
+        .book-cover .front { background-color: #2c3e50; color: white; justify-content: center; align-items: center; border-left: 10px solid #1a252f; }
+        .book-cover .back { background-color: #34495e; }
+
+        /* 2. 시그니처 속지 레이어 (생일 메시지) */
+        .signature-page { z-index: 2; }
+        .signature-page .front { background-color: var(--paper); padding: 30px; border-left: 2px solid #ddd; }
+        .signature-page .back { background-color: #f5f2e9; }
+
+        /* 3. 목차 페이지 (고정) */
+        .contents-page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            z-index: 1;
+            padding: 40px 30px;
+            box-sizing: border-box;
+            border-radius: 0 5px 5px 0;
+            box-shadow: 5px 5px 20px rgba(0,0,0,0.1);
+        }
+
+        /* 열림 상태 애니메이션 */
+        .opened { transform: rotateY(-160deg); z-index: 4 !important; }
+
+        /* 디자인 요소 */
+        .sig-frame { border: 2px solid rgba(212, 175, 55, 0.3); height: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; background: white; }
+        .birthday-icon { font-size: 3rem; margin-bottom: 15px; }
+        .seal { position: absolute; bottom: 30px; left: 30px; width: 60px; height: 60px; border: 2px solid #b22222; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #b22222; font-size: 0.5rem; font-weight: bold; transform: rotate(-15deg); opacity: 0.6; }
+        .contents-title { font-size: 1.2rem; font-weight: bold; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 30px; text-align: center; }
+        .toc-item { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.9rem; border-bottom: 1px dotted #ccc; padding-bottom: 5px; }
+
+        .guide-hint { margin-top: 30px; color: #888; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <div class="book-container">
+        <div class="page book-cover" id="layer-cover" onclick="togglePage('layer-cover', 3)">
+            <div class="front">
+                <div style="font-size: 0.7rem; margin-bottom: 20px; letter-spacing: 2px;">DADOK e SIGNATURE</div>
+                <div style="font-size: 1.6rem; font-weight: bold;">어린 왕자</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">생일 축하 에디션</div>
+                <div style="margin-top: 60px; font-size: 0.7rem; border: 1px solid white; padding: 5px 15px;">표지를 열어보세요</div>
+            </div>
+            <div class="back"></div>
+        </div>
+
+        <div class="page signature-page" id="layer-sig" onclick="togglePage('layer-sig', 2)">
+            <div class="front">
+                <div class="sig-frame">
+                    <div class="birthday-icon">🎂</div>
+                    <div style="font-size: 1.1rem; color: var(--gold); font-weight: bold; margin-bottom: 15px;">HAPPY BIRTHDAY!</div>
+                    <div style="font-size: 0.9rem; color: #444; line-height: 1.8; text-align: center;">
+                        "너의 가장 특별한 날,<br>
+                        이 책이 너에게 따뜻한<br>
+                        위로와 즐거움이 되길 바라.<br>
+                        태어나줘서 고마워!"
+                    </div>
+                    <div style="margin-top: auto; align-self: flex-end; font-family: 'Cursive', serif; font-size: 1.2rem; color: #2c3e50;">
+                        - 당신의 단짝 민지 -
+                    </div>
+                    <div class="seal">
+                        <div>LIMITED</div>
+                        <div style="border-top: 1px solid #b22222; border-bottom: 1px solid #b22222; margin: 2px 0;">2026.01.09</div>
+                        <div>No. 00871</div>
+                    </div>
+                </div>
+            </div>
+            <div class="back"></div>
+        </div>
+
+        <div class="contents-page">
+            <div class="contents-title">CONTENTS</div>
+            <div class="toc-item"><span>1. 사막에서 만난 친구</span><span>7</span></div>
+            <div class="toc-item"><span>2. 소행성 B-612</span><span>25</span></div>
+            <div class="toc-item"><span>3. 장미와 나눈 대화</span><span>48</span></div>
+            <div class="toc-item"><span>4. 여우의 가르침</span><span>72</span></div>
+            <div style="text-align: center; margin-top: 50px; color: var(--gold); font-size: 0.8rem;">[ 실제 독서가 시작됩니다 ]</div>
+        </div>
+    </div>
+
+    <div class="guide-hint">책장을 클릭하면 넘어가고, 뒷면을 클릭하면 다시 닫힙니다.</div>
+
+    <script>
+        function togglePage(id, originalZIndex) {
+            const el = document.getElementById(id);
+            const isOpening = !el.classList.contains('opened');
+            
+            if (isOpening) {
+                el.classList.add('opened');
+                // 넘길 때는 z-index를 높여서 다른 페이지 위에 오게 함
+                el.style.zIndex = 10;
+            } else {
+                el.classList.remove('opened');
+                // 닫을 때는 원래의 z-index로 복구하여 아래로 깔리게 함
+                setTimeout(() => {
+                    el.style.zIndex = originalZIndex;
+                }, 500); // 애니메이션 절반 시점에 순차적으로 복구
+            }
+        }
+    </script>
+</body>
+</html>

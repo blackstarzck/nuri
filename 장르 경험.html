@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>다독e - 장르별 몰입 대여</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark: #0a0a0c;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: white;
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* 1. 메인 리스트 페이지 */
+        #main-page {
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero { text-align: center; margin-bottom: 50px; }
+        .hero h1 { color: var(--gold); font-size: 2.5rem; }
+
+        .genre-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .genre-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .genre-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .genre-card h3 { margin: 15px 0; font-size: 1.4rem; }
+        .genre-card .timer { color: #ff4d4d; font-weight: bold; font-size: 0.9rem; }
+
+        /* 2. 상세 페이지 (초기 숨김) */
+        #detail-page {
+            display: none;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1px solid #555;
+            color: #ccc;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .detail-header { border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .detail-header h2 { color: var(--gold); margin: 0; }
+
+        .book-detail-item {
+            display: flex;
+            gap: 25px;
+            background: #151515;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .book-cover-large {
+            width: 120px;
+            height: 170px;
+            background: #222;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            flex-shrink: 0;
+            border: 1px solid #444;
+        }
+
+        .book-info h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
+        .book-info .author { color: var(--gold); font-size: 0.9rem; margin-bottom: 10px; display: block; }
+        .book-info .desc { color: #aaa; font-size: 0.85rem; line-height: 1.6; }
+
+        .rent-action {
+            margin-top: 40px;
+            text-align: center;
+            background: #111;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px dashed var(--gold);
+        }
+
+        .rent-confirm-btn {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-page">
+        <div class="hero">
+            <h1>DADOK e</h1>
+            <p>장르별 몰입형 시간 대여 플랫폼</p>
+        </div>
+
+        <div class="genre-container">
+            <div class="genre-card" onclick="showDetail('mystery')">
+                <div style="font-size: 3rem;">🕵️‍♂️</div>
+                <h3>추리: 셜록 홈즈 세트</h3>
+                <p class="timer">48시간 몰입 패키지</p>
+            </div>
+            <div class="genre-card" onclick="showDetail('romance')">
+                <div style="font-size: 3rem;">❤️</div>
+                <h3>로맨스: 고전의 설렘</h3>
+                <p class="timer">24시간 감성 패키지</p>
+            </div>
+            <div class="genre-card" onclick="showDetail('growth')">
+                <div style="font-size: 3rem;">⚡</div>
+                <h3>자기계발: 갓생 치트키</h3>
+                <p class="timer">12시간 쾌속 패키지</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-page">
+        <button class="back-btn" onclick="showMain()">← 뒤로가기</button>
+        
+        <div class="detail-header">
+            <h2 id="package-title">장르 패키지명</h2>
+            <p id="package-desc" style="color: #888;"></p>
+        </div>
+
+        <div id="book-details-container">
+            </div>
+
+        <div class="rent-action">
+            <div style="font-size: 0.9rem; color: #ff4d4d; margin-bottom: 10px;">※ 결제 즉시 타이머가 시작되며, 기간 종료 후 자동 차단됩니다.</div>
+            <div id="rent-price" style="font-size: 1.5rem; font-weight: bold;"></div>
+            <button class="rent-confirm-btn" onclick="alert('대여가 완료되었습니다! 서재로 이동합니다.')">지금 바로 몰입하기</button>
+        </div>
+    </div>
+
+    <script>
+        const genreData = {
+            mystery: {
+                title: "셜록 홈즈와 주말을 함께",
+                desc: "아서 코난 도일이 창조한 가장 완벽한 탐정의 세계에 빠져보세요.",
+                price: "3,900원",
+                books: [
+                    { title: "셜록 홈즈 1", author: "아서 코난 도일", icon: "🔍", desc: "셜록 홈즈의 전설적인 시작, 주해와 함께 깊이 있게 읽는 고전." },
+                    { title: "셜록 홈즈 2", author: "아서 코난 도일", icon: "🩸", desc: "홈즈와 왓슨의 본격적인 활약상을 다룬 중단편 모음." },
+                    { title: "셜록의 회상", author: "아서 코난 도일", icon: "🕵️", desc: "사건 이면의 날카로운 추리력이 돋보이는 대표 걸작." }
+                ]
+            },
+            romance: {
+                title: "잠 못 드는 밤, 설렘 한 잔",
+                desc: "시간이 흘러도 변하지 않는 사랑의 본질을 다룬 명작들입니다.",
+                price: "2,500원",
+                books: [
+                    { title: "오만과 편견", author: "제인 오스틴", icon: "❤️", desc: "오해와 편견을 넘어 진정한 사랑을 찾아가는 과정." },
+                    { title: "설득", author: "제인 오스틴", icon: "💌", desc: "차분하고 성숙한 사랑의 깊이를 느낄 수 있는 마지막 유작." }
+                ]
+            },
+            growth: {
+                title: "무너진 갓생 심폐소생술",
+                desc: "단 12시간, 당신의 생산성을 비약적으로 높여줄 핵심 전략.",
+                price: "1,500원",
+                books: [
+                    { title: "원씽 (The One Thing)", author: "게리 켈러", icon: "⚡", desc: "복잡한 세상을 이기는 단 하나의 단순한 원리." },
+                    { title: "몰입", author: "황농문", icon: "📈", desc: "두뇌를 풀가동시켜 최고의 성과를 내는 몰입의 힘." }
+                ]
+            }
+        };
+
+        function showDetail(genre) {
+            const data = genreData[genre];
+            document.getElementById('package-title').innerText = data.title;
+            document.getElementById('package-desc').innerText = data.desc;
+            document.getElementById('rent-price').innerText = data.price;
+
+            const container = document.getElementById('book-details-container');
+            container.innerHTML = '';
+
+            data.books.forEach(book => {
+                container.innerHTML += `
+                    <div class="book-detail-item">
+                        <div class="book-cover-large">${book.icon}</div>
+                        <div class="book-info">
+                            <h3>${book.title}</h3>
+                            <span class="author">${book.author}</span>
+                            <p class="desc">${book.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('main-page').style.display = 'none';
+            document.getElementById('detail-page').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function showMain() {
+            document.getElementById('main-page').style.display = 'flex';
+            document.getElementById('detail-page').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

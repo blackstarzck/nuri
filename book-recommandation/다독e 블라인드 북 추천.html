@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>다독e - 블라인드 북 추천</title>
+    <style>
+        :root {
+            --gold: #d4af37;
+            --dark-gray: #1a1a1a;
+            --mystery-purple: #2c003e;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: white;
+            font-family: 'Pretendard', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 1. 블라인드 배너 레이아웃 */
+        .blind-container {
+            width: 380px;
+            background: linear-gradient(145deg, #111, var(--mystery-purple));
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+
+        .blind-label {
+            font-size: 0.8rem;
+            color: var(--gold);
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .fate-sentence {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            font-weight: 600;
+            margin-bottom: 40px;
+            word-break: keep-all;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .keywords {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .tag {
+            font-size: 0.85rem;
+            color: #aaa;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            border-radius: 15px;
+        }
+
+        /* 2. 결제 버튼 및 애니메이션 */
+        .pay-btn {
+            width: 100%;
+            background-color: var(--gold);
+            color: black;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .pay-btn:active { transform: scale(0.98); }
+
+        /* 3. 로딩 및 결과 레이어 */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            border-radius: 20px;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .loader {
+            border: 3px solid #333;
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 도서 공개 레이아웃 */
+        .book-reveal {
+            display: none;
+            text-align: center;
+        }
+
+        .book-cover-mock {
+            width: 140px;
+            height: 200px;
+            background: #333;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blind-container" id="mainContainer">
+        <span class="blind-label">BLIND BOOK #042</span>
+        
+        <div class="fate-sentence">
+            "그날 밤, 내가 죽인 줄 알았던 남자가 우리 집 초인종을 눌렀다."
+        </div>
+
+        <div class="keywords">
+            <span class="tag">#여름밤</span>
+            <span class="tag">#미스터리</span>
+            <span class="tag">#반전주의</span>
+        </div>
+
+        <button class="pay-btn" onclick="startProcess()">오늘 하루 운명을 느껴보기 (900원)</button>
+
+        <div class="overlay" id="loadingOverlay">
+            <div id="loadingContent">
+                <div class="loader"></div>
+                <div style="color: var(--gold);">좋은 예감은 틀리지 않죠...</div>
+            </div>
+            
+            <div class="book-reveal" id="revealContent">
+                <div style="font-size: 0.9rem; margin-bottom: 10px;">찾았습니다! 당신이 기다리던 바로 그 책!</div>
+                <div class="book-cover-mock">도서 표지<br>공개</div>
+                <h3 style="margin: 0;">남겨진 자들의 밤</h3>
+                <p style="font-size: 0.8rem; color: #888;">지금부터 24시간 동안 열람 가능합니다.</p>
+                <button class="pay-btn" style="margin-top: 10px;" onclick="location.reload()">다시 운명 찾기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function startProcess() {
+            const overlay = document.getElementById('loadingOverlay');
+            const loading = document.getElementById('loadingContent');
+            const reveal = document.getElementById('revealContent');
+
+            overlay.style.display = 'flex';
+            
+            // 결제 진행 애니메이션 시뮬레이션
+            setTimeout(() => {
+                loading.style.display = 'none';
+                reveal.style.display = 'block';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
